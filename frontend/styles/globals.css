@@ -1,0 +1,21 @@
+/* wajib: biar Split kasih layout row */
+.split {
+  display: flex;       /* ini yg bikin horizontal bener */
+  flex-direction: row; /* kiri-kanan */
+  width: 100%;
+  height: 100%;
+}
+
+.gutter {
+  background-color: #ddd;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.gutter.gutter-horizontal {
+  cursor: col-resize;
+}
+
+.gutter.gutter-vertical {
+  cursor: row-resize;
+}
