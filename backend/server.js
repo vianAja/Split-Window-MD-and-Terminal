@@ -4,12 +4,35 @@ import { Client } from "ssh2";
 import http from "http";
 import fs from "fs";
 import dotenv from "dotenv";
+import { exec } from "child_process";
 
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
+
+// 🔎 Coba jalankan hostnamectl / hostname biar keliatan di log
+exec("hostnamectl", (error, stdout, stderr) => {
+  if (error) {
+    console.error("⚠️ hostnamectl error:", error.message);
+    console.log("👉 coba pakai `hostname` saja...");
+
+    exec("hostname", (err, out) => {
+      if (err) {
+        console.error("⚠️ hostname command error:", err.message);
+      } else {
+        console.log("📛 Container hostname:", out.trim());
+      }
+    });
+
+    return;
+  }
+  if (stderr) {
+    console.error("hostnamectl stderr:", stderr);
+  }
+  console.log("📋 Hostnamectl Output:\n" + stdout);
+});
 
 // Endpoint test
 app.get("/", (req, res) => {
@@ -30,14 +53,25 @@ wss.on("connection", (ws) => {
           return;
         }
 
-        // Data dari VM -> kirim ke terminal (xterm.js)
+        // STDOUT dari VM
         stream.on("data", (data) => {
-          ws.send(data.toString());
+          const output = data.toString();
+          console.log("📤 VM stdout:", output.trim());
+          ws.send(output);
         });
 
-        // Data dari terminal -> kirim ke VM
+        // STDERR dari VM
+        stream.stderr.on("data", (data) => {
+          const errorOutput = data.toString();
+          console.error("⚠️ VM stderr:", errorOutput.trim());
+          ws.send(errorOutput);
+        });
+
+        // Data dari terminal (frontend) -> kirim ke VM
         ws.on("message", (msg) => {
-          stream.write(msg.toString());
+          const input = msg.toString();
+          console.log("⌨️ From client:", JSON.stringify(input));
+          stream.write(input);
         });
 
         // Handle disconnect
@@ -52,13 +86,13 @@ wss.on("connection", (ws) => {
       ws.send("SSH connection failed: " + err.message);
     })
     .connect({
-      host: process.env.VM_HOST,
-      port: process.env.VM_PORT,
-      username: process.env.VM_USER,
-      privateKey: fs.readFileSync(process.env.VM_KEY),
+      host: "host.docker.internal",
+      port: 22,
+      username: "vian",
+      password: "123"
+//      privateKey: fs.readFileSync("id_rsa")
     });
 });
-
-server.listen(3001, () => {
+server.listen(3001, "0.0.0.0", () => {
   console.log("🚀 Backend running at http://localhost:3001");
 });
