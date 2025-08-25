@@ -116,7 +116,7 @@ nano Split-Window-MD-and-Terminal/frontend/components/MarkdownPanel.js
   ```
 - build the image
   ```bash
-  docker compose build .
+  docker compose build
   ```
 - run the container
   ```bash
