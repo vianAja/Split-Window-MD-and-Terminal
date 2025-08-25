@@ -40,11 +40,15 @@ nano backend/server.js
 You can change the Content instruction on left panel, you just go on folder `public`, and now you can create a Markdown file to change the content teory or instruction
 - Change directory
 ```bash
-cd Split-Window-MD-and-Terminal/
+cd Split-Window-MD-and-Terminal/frontend/public
 ```
 
-- edit file `sample.md` or you can create new file with extention `.md` or markdown
-- If you create new file, you want to adjust on file 
+- edit file `sample.md` or you can create new file with extention `.md` (markdown file)
+```bash
+nano sample.md
+```
+
+- If you create new file, you want to adjust on file `MarkdownPanel.js` pathing the markdown file new.
 ```bash
 nano Split-Window-MD-and-Terminal/frontend/components/MarkdownPanel.js
 ```
@@ -52,7 +56,7 @@ nano Split-Window-MD-and-Terminal/frontend/components/MarkdownPanel.js
 - Go to section code like in the below
 ```js
   useEffect(() => {
-    fetch("/sample.md")  // take markdown file from folder public/
+    fetch("/sample.md")  // path markdown file from folder public/
       .then((res) => res.text())
       .then((text) => setContent(text));
   }, []);
@@ -65,7 +69,7 @@ nano Split-Window-MD-and-Terminal/frontend/components/MarkdownPanel.js
 
 ## 1. Manual
 ### Prerequisites
-- NodeJS version minimal 18
+- Minimal NodeJS version 18
 
 ### A. Backend
 
@@ -114,13 +118,9 @@ nano Split-Window-MD-and-Terminal/frontend/components/MarkdownPanel.js
   ```bash
   cd Split-Window-MD-and-Terminal/
   ```
-- build the image
+- run and build the container
   ```bash
-  docker compose build
-  ```
-- run the container
-  ```bash
-  docker compose up -d
+  docker compose up -d --build
   ```
 
 ### Delete the container
