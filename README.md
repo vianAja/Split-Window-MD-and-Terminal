@@ -6,6 +6,51 @@ Here are the results:
 
 ![result](img/img1.png)
 
+# General Information
+### Port Mapping
+- Backend run on port `3001`
+- Fronend run on port `3000`
+
+### Connection SSH backend into VM
+You can adjust the credentials to connecnt SSH to VM for terminal window.
+- Open file `backend/server.js`
+```bash 
+nano backend/server.js
+```
+- scroll down and you can adjust on section code like in the below
+
+```js
+    .connect({
+      host: "host.docker.internal",  //in this case using docker host VM
+      port: 22, // port of SSH, if using custom you can adjust
+      username: "<USERNAME>",
+      password: "<PASSWORD>"
+    });
+```
+
+> On Progress Development, not a finish code
+
+### Change the content LMS
+You can change the Content instruction on left panel, you just go on folder `public`, and now you can create a Markdown file to change the content teory or instruction
+- Change directory
+```bash
+cd Split-Window-MD-and-Terminal/
+```
+
+- edit file `sample.md` or you can create new file with extention `.md` or markdown
+- If you create new file, you want to adjust on file 
+```bash
+nano Split-Window-MD-and-Terminal/frontend/components/MarkdownPanel.js
+```
+
+- Go to section code like in the below
+```js
+  useEffect(() => {
+    fetch("/sample.md")  // take markdown file from folder public/
+      .then((res) => res.text())
+      .then((text) => setContent(text));
+  }, []);
+```
 
 # Installation
 
@@ -75,10 +120,15 @@ Here are the results:
   docker compose down --rmi all
   ```
 
+# How to Use it?
+You can check the output on 
+```
+
+
 # Reference Idea
 
-- Hand on Lab in [DqLab](https://dqlab.id/)
+- Hands on Lab in [DqLab](https://dqlab.id/) Course
 
-- Hand on free Labs in [kodeCloud](https://kodekloud.com/)
+- Hands on free Labs in [kodeCloud](https://kodekloud.com/)
 
-![](img/kodecloud.png)
+![kodecloud-free-labs](img/kodecloud.png)

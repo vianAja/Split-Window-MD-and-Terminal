@@ -1,25 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
-const content = `
-# Welcome to the Web Lab
-
-This is the **theory panel** on the left.  
-You can write instructions here.  
-
-Support for \`inline code\`.  
-
-Even code blocks:
-
-\`\`\`bash
-ls -la
-echo "Hello from VM"
-\`\`\`
-`;
-
 export default function MarkdownPanel() {
+  const [content, setContent] = useState("");
+
+  useEffect(() => {
+    fetch("/sample.md") // ambil file markdown dari public/
+      .then((res) => res.text())
+      .then((text) => setContent(text));
+  }, []);
+
   return (
-    <div className="prose max-w-none">
+    <div className="p-4 overflow-auto bg-gray-50 h-full text-gray-800">
       <ReactMarkdown>{content}</ReactMarkdown>
     </div>
   );
