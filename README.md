@@ -6,10 +6,14 @@ Here are the results:
 
 ![result](img/img1.png)
 
+---
+
 # General Information
 ### Port Mapping
 - Backend run on port `3001`
 - Fronend run on port `3000`
+
+---
 
 ### Connection SSH backend into VM
 You can adjust the credentials to connecnt SSH to VM for terminal window.
@@ -29,6 +33,8 @@ nano backend/server.js
 ```
 
 > On Progress Development, not a finish code
+
+---
 
 ### Change the content LMS
 You can change the Content instruction on left panel, you just go on folder `public`, and now you can create a Markdown file to change the content teory or instruction
@@ -51,6 +57,9 @@ nano Split-Window-MD-and-Terminal/frontend/components/MarkdownPanel.js
       .then((text) => setContent(text));
   }, []);
 ```
+> On Progress Development, not a finish code
+
+---
 
 # Installation
 
@@ -72,6 +81,9 @@ nano Split-Window-MD-and-Terminal/frontend/components/MarkdownPanel.js
   ```bash
   npm start
   ```
+
+---
+
 ### B. Frontend
 
 - Change directory to `frontend`
@@ -90,6 +102,7 @@ nano Split-Window-MD-and-Terminal/frontend/components/MarkdownPanel.js
   ```bash
   npm start
   ```
+---
 
 ## 2. Container Docker
 ### Prerequisites
@@ -119,12 +132,17 @@ nano Split-Window-MD-and-Terminal/frontend/components/MarkdownPanel.js
   ```bash
   docker compose down --rmi all
   ```
+---
 
 # How to Use it?
-You can check the output on 
+You can check the output on browser using
 ```
+http://localhost:3000
+```
+And now there show output like this for example, on right panel, you can run command linux like in the real VM or computer with os Ubuntu linux for this example, and you can configure it. It same like Real the computer or VM
 
-
+![result](img/img1.png)
+---
 # Reference Idea
 
 - Hands on Lab in [DqLab](https://dqlab.id/) Course
