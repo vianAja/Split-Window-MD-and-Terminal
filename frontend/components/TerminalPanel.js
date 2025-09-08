@@ -1,41 +1,60 @@
-import { NodeSSH } from "node-ssh";
 import React, { useEffect, useRef } from "react";
 import { Terminal } from "xterm";
 import "xterm/css/xterm.css";
 
-const ssh = new NodeSSH();
-//const wss = new WebSocketServer({ port: 3001 });
-const wss = new WebSocket("ws://localhost:3001");
+const TerminalPanel = () => {
+  const terminalRef = useRef(null);
 
-wss.on("connection", async (ws) => {
-  console.log("✅ WebSocket client connected");
-
-  try {
-    await ssh.connect({
-      host: "your-server-ip",
-      username: "student",
-      password: "yourpassword",
+  useEffect(() => {
+    const term = new Terminal({
+      cursorBlink: true,
+      fontSize: 14,
+      theme: {
+        background: "#1e1e1e", // mirip VSCode dark
+      },
     });
 
-    const stream = await ssh.requestShell();
+    term.open(terminalRef.current);
 
-    stream.on("data", (data) => {
-      ws.send(data.toString());
+    // 🔌 Connect ke backend WebSocket
+    const ws = new WebSocket("ws://localhost:3001");
+
+    ws.onopen = () => {
+      term.writeln("✅ Connected to WebSocket SSH server\r\n");
+    };
+
+    ws.onmessage = (event) => {
+      term.write(event.data);
+    };
+
+    ws.onerror = (err) => {
+      term.writeln("\r\n❌ WebSocket error: " + err.message);
+    };
+
+    ws.onclose = () => {
+      term.writeln("\r\n❌ Disconnected from WebSocket server");
+    };
+
+    // Input dari user -> kirim ke backend
+    term.onData((data) => {
+      ws.send(data);
     });
 
-    ws.on("message", (msg) => {
-      stream.write(msg.toString());
-    });
+    return () => {
+      ws.close();
+    };
+  }, []);
 
-    ws.on("close", () => {
-      stream.end();
-      ssh.dispose();
-      console.log("⚠️ Client disconnected, SSH closed");
-    });
-  } catch (err) {
-    console.error("❌ SSH connection failed:", err);
-    ws.send("❌ SSH connection failed, check backend logs\n");
-  }
-});
+  return (
+    <div
+      ref={terminalRef}
+      style={{
+        height: "500px",
+        width: "100%",
+        backgroundColor: "#000",
+      }}
+    />
+  );
+};
 
-console.log("🚀 WebSocket SSH bridge running at ws://localhost:3001");
+export default TerminalPanel;

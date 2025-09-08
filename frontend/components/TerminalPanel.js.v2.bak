@@ -1,0 +1,41 @@
+import { NodeSSH } from "node-ssh";
+import React, { useEffect, useRef } from "react";
+import { Terminal } from "xterm";
+import "xterm/css/xterm.css";
+
+const ssh = new NodeSSH();
+//const wss = new WebSocketServer({ port: 3001 });
+const wss = new WebSocket("ws://localhost:3001");
+
+wss.on("connection", async (ws) => {
+  console.log("✅ WebSocket client connected");
+
+  try {
+    await ssh.connect({
+      host: "your-server-ip",
+      username: "student",
+      password: "yourpassword",
+    });
+
+    const stream = await ssh.requestShell();
+
+    stream.on("data", (data) => {
+      ws.send(data.toString());
+    });
+
+    ws.on("message", (msg) => {
+      stream.write(msg.toString());
+    });
+
+    ws.on("close", () => {
+      stream.end();
+      ssh.dispose();
+      console.log("⚠️ Client disconnected, SSH closed");
+    });
+  } catch (err) {
+    console.error("❌ SSH connection failed:", err);
+    ws.send("❌ SSH connection failed, check backend logs\n");
+  }
+});
+
+console.log("🚀 WebSocket SSH bridge running at ws://localhost:3001");
