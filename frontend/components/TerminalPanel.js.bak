@@ -2,31 +2,37 @@ import React, { useEffect, useRef } from "react";
 import { Terminal } from "xterm";
 import "xterm/css/xterm.css";
 
-export default function TerminalPanel() {
+const TerminalPanel = ({ connected }) => {
   const terminalRef = useRef(null);
+  const wsRef = useRef(null);
   const termRef = useRef(null);
 
   useEffect(() => {
+    // Init terminal (sekali aja)
     const term = new Terminal({
       cursorBlink: true,
       fontSize: 14,
       theme: {
-        background: "#000000",
-        foreground: "#ffffff",
+        background: "#1e1e1e",
       },
     });
-
     term.open(terminalRef.current);
-    term.focus();
     termRef.current = term;
 
-    const wsUrl = `ws://localhost:3001`;
-    term.writeln(`🔌 Connecting to ${wsUrl} ...\r\n`);
+    return () => {
+      term.dispose();
+    };
+  }, []);
 
-    const ws = new WebSocket(wsUrl);
+  useEffect(() => {
+    if (!connected || !termRef.current) return;
+
+    const term = termRef.current;
+    const ws = new WebSocket("ws://localhost:3001");
+    wsRef.current = ws;
 
     ws.onopen = () => {
-      term.writeln("✅ Connected to backend...\r\n");
+      term.writeln("✅ Connected to WebSocket SSH server\r\n");
     };
 
     ws.onmessage = (event) => {
@@ -34,33 +40,34 @@ export default function TerminalPanel() {
     };
 
     ws.onerror = (err) => {
-      console.error("❌ WebSocket error:", err);
-      term.writeln("❌ WebSocket error (lihat console browser)\r\n");
+      term.writeln("\r\n❌ WebSocket error: " + err.message);
     };
 
-    ws.onclose = (event) => {
-      term.writeln(
-        `⚠️ Disconnected from backend (code=${event.code}, reason=${event.reason})\r\n`
-      );
+    ws.onclose = () => {
+      term.writeln("\r\n❌ Disconnected from WebSocket server");
     };
 
-    // kirim input user ke backend (tanpa echo manual)
     term.onData((data) => {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(data);
-        console.log("👉 sending:", JSON.stringify(data));
       }
     });
 
     return () => {
       ws.close();
-      term.dispose();
     };
-  }, []);
+  }, [connected]);
 
   return (
-    <div className="h-full w-full bg-black">
-      <div ref={terminalRef} className="h-full w-full" tabIndex={0} />
-    </div>
+    <div
+      ref={terminalRef}
+      style={{
+        height: "500px",
+        width: "100%",
+        backgroundColor: "#000",
+      }}
+    />
   );
-}
+};
+
+export default TerminalPanel;
