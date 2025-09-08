@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"pages\\\\index.js -> ../components/TerminalPanel\":{\"id\":\"pages\\\\index.js -> ../components/TerminalPanel\",\"files\":[\"static/chunks/components_TerminalPanel_js.js\"]}}"
+self.__REACT_LOADABLE_MANIFEST="{}"

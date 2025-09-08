@@ -1,0 +1,16 @@
+name: Build and Run Docker Container
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  docker-build-run:
+    runs-on: [self-hosted, Linux]  # pastikan sesuai label runner
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run and Build Docker container
+        run: |
+          docker compose up -d --build

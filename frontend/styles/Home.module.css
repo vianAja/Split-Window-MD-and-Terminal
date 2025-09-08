@@ -1,0 +1,21 @@
+.split {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.gutter {
+  background-color: #e5e7eb;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.gutter.gutter-horizontal {
+  cursor: col-resize;
+  width: 8px;
+}
+
+.gutter.gutter-vertical {
+  cursor: row-resize;
+  height: 8px;
+}

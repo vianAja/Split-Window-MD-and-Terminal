@@ -1,66 +1,41 @@
+import { NodeSSH } from "node-ssh";
 import React, { useEffect, useRef } from "react";
 import { Terminal } from "xterm";
 import "xterm/css/xterm.css";
 
-export default function TerminalPanel() {
-  const terminalRef = useRef(null);
-  const termRef = useRef(null);
+const ssh = new NodeSSH();
+//const wss = new WebSocketServer({ port: 3001 });
+const wss = new WebSocket("ws://localhost:3001");
 
-  useEffect(() => {
-    const term = new Terminal({
-      cursorBlink: true,
-      fontSize: 14,
-      theme: {
-        background: "#000000",
-        foreground: "#ffffff",
-      },
+wss.on("connection", async (ws) => {
+  console.log("✅ WebSocket client connected");
+
+  try {
+    await ssh.connect({
+      host: "your-server-ip",
+      username: "student",
+      password: "yourpassword",
     });
 
-    term.open(terminalRef.current);
-    term.focus();
-    termRef.current = term;
+    const stream = await ssh.requestShell();
 
-    const wsUrl = `ws://localhost:3001`;
-    term.writeln(`🔌 Connecting to ${wsUrl} ...\r\n`);
-
-    const ws = new WebSocket(wsUrl);
-
-    ws.onopen = () => {
-      term.writeln("✅ Connected to backend...\r\n");
-    };
-
-    ws.onmessage = (event) => {
-      term.write(event.data);
-    };
-
-    ws.onerror = (err) => {
-      console.error("❌ WebSocket error:", err);
-      term.writeln("❌ WebSocket error (lihat console browser)\r\n");
-    };
-
-    ws.onclose = (event) => {
-      term.writeln(
-        `⚠️ Disconnected from backend (code=${event.code}, reason=${event.reason})\r\n`
-      );
-    };
-
-    // kirim input user ke backend (tanpa echo manual)
-    term.onData((data) => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(data);
-        console.log("👉 sending:", JSON.stringify(data));
-      }
+    stream.on("data", (data) => {
+      ws.send(data.toString());
     });
 
-    return () => {
-      ws.close();
-      term.dispose();
-    };
-  }, []);
+    ws.on("message", (msg) => {
+      stream.write(msg.toString());
+    });
 
-  return (
-    <div className="h-full w-full bg-black">
-      <div ref={terminalRef} className="h-full w-full" tabIndex={0} />
-    </div>
-  );
-}
+    ws.on("close", () => {
+      stream.end();
+      ssh.dispose();
+      console.log("⚠️ Client disconnected, SSH closed");
+    });
+  } catch (err) {
+    console.error("❌ SSH connection failed:", err);
+    ws.send("❌ SSH connection failed, check backend logs\n");
+  }
+});
+
+console.log("🚀 WebSocket SSH bridge running at ws://localhost:3001");
