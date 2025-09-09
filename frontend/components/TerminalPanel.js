@@ -26,15 +26,24 @@ const TerminalPanel = ({ connected }) => {   // ⬅️ terima prop connected
 
       term.onData((data) => ws.send(data));
 
+      // simpan instance
       termRef.current = term;
-
-      return () => {
-        ws.close();
-        term.dispose();
-        termRef.current = null;
-      };
+      wsRef.current = ws;
     }
+
+    // ✅ cleanup kalau `connected` berubah jadi false / komponen unmount
+    return () => {
+      if (!connected && wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+      if (!connected && termRef.current) {
+        termRef.current.dispose();
+        termRef.current = null;
+      }
+    };
   }, [connected]);
+
 
   return (
     <div

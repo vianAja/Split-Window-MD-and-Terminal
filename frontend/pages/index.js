@@ -51,7 +51,7 @@ export default function Home() {
             <button className="btn-grade">Grade</button>
           </div>
             <div className="flex-1 bg-gray-300">
-              <TerminalPanel />
+              <TerminalPanel connected={connected} />
             </div>
           </div>
         </Split>
