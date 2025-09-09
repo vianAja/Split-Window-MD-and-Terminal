@@ -42,7 +42,12 @@ export default function Home() {
           
           <div className="h-full overflow-auto bg-gray-100 flex flex-col">
           <div className="flex justify-end space-x-4 p-4 bg-gray-100">
-            <button className="btn-start">Start</button>
+            <button
+              onClick={() => setConnected(true)}
+              disabled={connected}
+            >
+              Start
+            </button>
             <button className="btn-grade">Grade</button>
           </div>
             <div className="flex-1 bg-gray-300">
