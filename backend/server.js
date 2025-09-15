@@ -22,7 +22,7 @@ const pool = new Pool({
   port: process.env.PGPORT || 5432,
   user: process.env.PGUSER || "vian",
   password: process.env.PGPASSWORD || "vian",
-  database: process.env.PGDATABASE || "participant",
+  database: process.env.PGDATABASE || "users",
 });
 
 // Middleware untuk parse body dan session
@@ -43,7 +43,7 @@ function requireLogin(req, res, next) {
 
 // Login routes
 app.get("/login", (req, res) => {
-  res.sendFile(process.cwd() + "/public/login.html");
+  res.sendFile(process.cwd() + "../frontend/public/login.html");
 });
 
 app.post("/login", async (req, res) => {
