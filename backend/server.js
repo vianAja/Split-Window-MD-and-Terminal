@@ -5,18 +5,25 @@ import http from "http";
 import fs from "fs";
 import dotenv from "dotenv";
 import { exec } from "child_process";
+import bodyParser from "body-parser";
+import cors from "cors";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import pkg from "pg";
+
+const { Pool } = pkg;
+dotenv.config();
+
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
-// Tambahan untuk login
-import session from "express-session";
-import bodyParser from "body-parser";
-import pkg from "pg";
-const { Pool } = pkg;
+app.use(cors());
+app.use(bodyParser.json());
 
-dotenv.config();
-// PostgreSQL connection pool
+const SECRET_KEY = process.env.JWT_SECRET || "your_secret_key";
+
+// PostgreSQL connection
 const pool = new Pool({
   host: process.env.PGHOST || "host.docker.internal",
   port: process.env.PGPORT || 5432,
@@ -25,92 +32,104 @@ const pool = new Pool({
   database: process.env.PGDATABASE || "users",
 });
 
-// Middleware untuk parse body dan session
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({
-  secret: "secret-key",  // ganti pakai ENV di produksi
-  resave: false,
-  saveUninitialized: false,
-}));
+// ---------------- AUTH SECTION ----------------
 
-// Middleware cek login
-function requireLogin(req, res, next) {
-  if (!req.session.user) {
-    return res.redirect("/login");
+// Register endpoint
+app.post("/register", async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password)
+    return res.status(400).json({ message: "Missing username or password" });
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const result = await pool.query(
+      "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username",
+      [username, hashedPassword]
+    );
+    res.status(201).json({ user: result.rows[0] });
+  } catch (err) {
+    if (err.code === "23505") {
+      res.status(409).json({ message: "Username already exists" });
+    } else {
+      console.error("Register error:", err);
+      res.status(500).json({ message: "Server error" });
+    }
   }
-  next();
-}
-
-// Login routes
-app.get("/login", (req, res) => {
-  res.sendFile(process.cwd() + "../frontend/public/login.html");
 });
 
+// Login endpoint
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
+  if (!username || !password)
+    return res.status(400).json({ message: "Missing username or password" });
+
   try {
-    const result = await pool.query(
-      "SELECT * FROM users WHERE username = $1 AND password = $2",
-      [username, password]   // ⚠️ plain text, di real case pakai bcrypt
+    const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
+    if (result.rows.length === 0)
+      return res.status(401).json({ message: "Invalid credentials" });
+
+    const user = result.rows[0];
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(401).json({ message: "Invalid credentials" });
+
+    const token = jwt.sign(
+      { id: user.id, username: user.username },
+      SECRET_KEY,
+      { expiresIn: "1h" }
     );
-    if (result.rows.length > 0) {
-      req.session.user = result.rows[0];
-      res.redirect("/home");
-    } else {
-      res.redirect("/login-error");
-    }
+    res.json({ token });
   } catch (err) {
-    console.error("⚠️ Login query error:", err);
-    res.status(500).send("Internal Server Error");
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-app.get("/login-error", (req, res) => {
-  res.send("<h1>❌ Login Failed</h1><p>Invalid username or password.</p><a href='/login'>Try again</a>");
+// Middleware to protect routes
+function requireAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ message: "No token provided" });
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    req.user = decoded; // save user info ke request
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+}
+
+// Protected route example
+app.get("/profile", requireAuth, (req, res) => {
+  res.json({ id: req.user.id, username: req.user.username });
 });
 
-app.get("/home", requireLogin, (req, res) => {
-  res.send(`<h1>Welcome ${req.session.user.username} 🎉</h1><a href="/logout">Logout</a>`);
-});
+// ---------------- LEGACY FEATURES (SSH + WS) ----------------
 
-app.get("/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.redirect("/login");
-  });
-});
-
-// 🔎 Coba jalankan hostnamectl / hostname biar keliatan di log
+// Run hostnamectl
 exec("hostnamectl", (error, stdout, stderr) => {
   if (error) {
     console.error("⚠️ hostnamectl error:", error.message);
-    console.log("👉 coba pakai `hostname` saja...");
-
     exec("hostname", (err, out) => {
-      if (err) {
-        console.error("⚠️ hostname command error:", err.message);
-      } else {
-        console.log("📛 Container hostname:", out.trim());
-      }
+      if (err) console.error("⚠️ hostname error:", err.message);
+      else console.log("📛 Container hostname:", out.trim());
     });
-
     return;
   }
-  if (stderr) {
-    console.error("hostnamectl stderr:", stderr);
-  }
+  if (stderr) console.error("hostnamectl stderr:", stderr);
   console.log("📋 Hostnamectl Output:\n" + stdout);
 });
 
-// Endpoint test
+// Root test endpoint
 app.get("/", (req, res) => {
-  res.send("Backend running: WebSocket SSH server active.");
+  res.send("Backend running: WebSocket SSH server + Auth integrated.");
 });
 
+// WebSocket SSH
 wss.on("connection", (ws) => {
   console.log("🔌 New WebSocket client connected");
 
   const conn = new Client();
-
   conn
     .on("ready", () => {
       console.log("✅ SSH Connection established with VM");
@@ -120,28 +139,11 @@ wss.on("connection", (ws) => {
           return;
         }
 
-        // STDOUT dari VM
-        stream.on("data", (data) => {
-          const output = data.toString();
-          console.log("📤 VM stdout:", output.trim());
-          ws.send(output);
-        });
+        stream.on("data", (data) => ws.send(data.toString()));
+        stream.stderr.on("data", (data) => ws.send(data.toString()));
 
-        // STDERR dari VM
-        stream.stderr.on("data", (data) => {
-          const errorOutput = data.toString();
-          console.error("⚠️ VM stderr:", errorOutput.trim());
-          ws.send(errorOutput);
-        });
+        ws.on("message", (msg) => stream.write(msg.toString()));
 
-        // Data dari terminal (frontend) -> kirim ke VM
-        ws.on("message", (msg) => {
-          const input = msg.toString();
-          console.log("⌨️ From client:", JSON.stringify(input));
-          stream.write(input);
-        });
-
-        // Handle disconnect
         ws.on("close", () => {
           console.log("❌ WebSocket client disconnected");
           conn.end();
@@ -149,17 +151,19 @@ wss.on("connection", (ws) => {
       });
     })
     .on("error", (err) => {
-      console.error("SSH connection error:", err);
+      console.error("SSH error:", err);
       ws.send("SSH connection failed: " + err.message);
     })
     .connect({
       host: "host.docker.internal",
       port: 22,
       username: "vian",
-      password: "123"
-//      privateKey: fs.readFileSync("id_rsa")
+      password: "123",
+      // privateKey: fs.readFileSync("id_rsa")
     });
 });
+
+// ---------------- START SERVER ----------------
 server.listen(3001, "0.0.0.0", () => {
   console.log("🚀 Backend running at http://localhost:3001");
 });
