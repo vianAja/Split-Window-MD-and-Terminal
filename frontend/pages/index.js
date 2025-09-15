@@ -6,6 +6,9 @@ import styles from "../styles/Home.module.css";
 import MarkdownPanel from "../components/MarkdownPanel";
 import Button from "../components/ui/Button";
 
+const TerminalPanel = dynamic(() => import("../components/TerminalPanel"), {
+  ssr: false,
+});
 export default function Home() {
   const [connected, setConnected] = useState(false);
   const [token, setToken] = useState(null);
