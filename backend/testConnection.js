@@ -6,7 +6,7 @@ const client = new Client({
   port: 5432,
   user: "vian",
   password: "vian",
-  database: "users",
+  database: "participant",
 });
 
 async function testConnection() {

@@ -29,7 +29,7 @@ const pool = new Pool({
   port: process.env.PGPORT || 5432,
   user: process.env.PGUSER || "vian",
   password: process.env.PGPASSWORD || "vian",
-  database: process.env.PGDATABASE || "users",
+  database: process.env.PGDATABASE || "participant",
 });
 
 // ---------------- AUTH SECTION ----------------
