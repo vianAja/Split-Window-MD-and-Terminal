@@ -21,7 +21,7 @@ const wss = new WebSocketServer({ server });
 app.use(cors());
 app.use(bodyParser.json());
 
-const SECRET_KEY = process.env.JWT_SECRET || "your_secret_key";
+const SECRET_KEY = process.env.JWT_SECRET || "test123";
 
 // PostgreSQL connection
 const pool = new Pool({

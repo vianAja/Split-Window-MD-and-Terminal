@@ -16,8 +16,12 @@ export default function Home() {
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
-    if (savedToken) setToken(savedToken);
-  }, []);
+   // if (savedToken) setToken(savedToken);
+    if (!savedToken) {
+      router.replace("/login"); // kalau tidak ada token, paksa ke login
+    }
+  }, [router]);
+
 
   const logout = () => {
     localStorage.removeItem("token");
