@@ -64,7 +64,9 @@ app.post("/login", async (req, res) => {
     return res.status(400).json({ message: "Missing username or password" });
 
   try {
+    console.log("🔎 Login attempt:", username);
     const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
+    console.log("🗄️ Query result:", result.rows);
     if (result.rows.length === 0)
       return res.status(401).json({ message: "Invalid credentials" });
 
@@ -107,18 +109,18 @@ app.get("/profile", requireAuth, (req, res) => {
 // ---------------- LEGACY FEATURES (SSH + WS) ----------------
 
 // Run hostnamectl
-exec("hostnamectl", (error, stdout, stderr) => {
-  if (error) {
-    console.error("⚠️ hostnamectl error:", error.message);
-    exec("hostname", (err, out) => {
-      if (err) console.error("⚠️ hostname error:", err.message);
-      else console.log("📛 Container hostname:", out.trim());
-    });
-    return;
-  }
-  if (stderr) console.error("hostnamectl stderr:", stderr);
-  console.log("📋 Hostnamectl Output:\n" + stdout);
-});
+// exec("hostnamectl", (error, stdout, stderr) => {
+//   if (error) {
+//     console.error("⚠️ hostnamectl error:", error.message);
+//     exec("hostname", (err, out) => {
+//       if (err) console.error("⚠️ hostname error:", err.message);
+//       else console.log("📛 Container hostname:", out.trim());
+//     });
+//     return;
+//   }
+//   if (stderr) console.error("hostnamectl stderr:", stderr);
+//   console.log("📋 Hostnamectl Output:\n" + stdout);
+// });
 
 // Root test endpoint
 app.get("/", (req, res) => {
