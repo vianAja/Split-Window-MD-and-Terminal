@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 
-const API_URL = "http://localhost:4000";
+const API_URL = "http://localhost:3001";
 
 export default function Login() {
   const [username, setUsername] = useState("");
