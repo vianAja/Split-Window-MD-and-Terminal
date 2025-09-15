@@ -1,7 +1,7 @@
 {
-  "name": "web-lab-backend",
+  "name": "backend-ssh-auth",
   "version": "1.0.0",
-  "description": "Backend with Express, WebSocket, SSH2, and PostgreSQL login system",
+  "description": "Backend with WebSocket SSH + PostgreSQL Auth (JWT)",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -9,15 +9,17 @@
     "dev": "nodemon index.js"
   },
   "dependencies": {
-    "body-parser": "^1.20.3",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "express-session": "^1.18.1",
-    "pg": "^8.13.0",
-    "ssh2": "^1.16.0",
-    "ws": "^8.18.0"
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.5",
+    "ssh2": "^1.15.0",
+    "ws": "^8.17.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.4"
   }
 }

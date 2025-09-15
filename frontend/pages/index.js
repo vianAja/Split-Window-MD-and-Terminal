@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Split from "react-split";
+import React, { useState } from "react";
+import dynamic from "next/dynamic";
+import styles from "../styles/Home.module.css";
+import MarkdownPanel from "../components/MarkdownPanel";
+import Button from "../components/ui/Button";
 
 export default function Home() {
   const [connected, setConnected] = useState(false);
