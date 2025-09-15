@@ -25,11 +25,11 @@ const SECRET_KEY = process.env.JWT_SECRET || "your_secret_key";
 
 // PostgreSQL connection
 const pool = new Pool({
-  host: process.env.PGHOST || "host.docker.internal",
-  port: process.env.PGPORT || 5432,
-  user: process.env.PGUSER || "vian",
-  password: process.env.PGPASSWORD || "vian",
-  database: process.env.PGDATABASE || "participant",
+  host: "host.docker.internal",   // atau IP address server PostgreSQL
+  port: 5432,
+  user: "vian",
+  password: "vian",
+  database: "participant",
 });
 
 // ---------------- AUTH SECTION ----------------
