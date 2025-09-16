@@ -32,4 +32,4 @@ router.post("/validate-user", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
