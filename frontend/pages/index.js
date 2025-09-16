@@ -25,8 +25,13 @@ export default function Home() {
       const res = await fetch("/api/validate-user", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: savedToken }),
+      body: JSON.stringify({
+        username: userData.username,
+        email: userData.email,
+        name: userData.name,
+      }),
     });
+      console.log("localStorage token raw:", localStorage.getItem("token"));
 
       const data = await res.json();
       console.log("Validate-user response:", data);

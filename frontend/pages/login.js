@@ -18,8 +18,12 @@ export default function Login() {
       console.log("res.data from login page:", res.data);
       console.log("res.data.token from login page:", res.data.token);
       // login.js
-      localStorage.setItem("token", JSON.stringify(res.data.token));
-
+      localStorage.setItem("token", JSON.stringify({
+        token: res.data.token,      // ambil token asli dari server
+        username: res.data.username, // ikut simpan kalau server kirim
+        email: res.data.email,
+        name: res.data.name
+      }));
       setMessage("Login successful!");
       router.push("/"); // redirect to home page after login
     } catch (err) {
