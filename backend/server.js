@@ -131,9 +131,6 @@ app.get("/", (req, res) => {
   res.send("Backend running: WebSocket SSH server + Auth integrated.");
 });
 
-app.use("/api", require("./routes/user"));
-
-
 // WebSocket SSH
 wss.on("connection", (ws) => {
   console.log("🔌 New WebSocket client connected");
