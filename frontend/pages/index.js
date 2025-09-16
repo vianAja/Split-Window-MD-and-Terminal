@@ -21,10 +21,10 @@ export default function Home() {
         alert("Not logged in!");
         return;
       }
-    
+
       // misalnya token menyimpan info user (atau bisa ambil dari /profile API)
       const userData = JSON.parse(savedToken);
-    
+      console.log("User data from saved token:", userData)
       const res = await fetch("/api/validate-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -34,9 +34,9 @@ export default function Home() {
           name: userData.name,
         }),
       });
-    
+
       const data = await res.json();
-    
+
       if (data.success) {
         setConnected(true);   // ✅ baru connect websocket
       } else {
