@@ -16,7 +16,9 @@ export default function Login() {
       const res = await axios.post(`${API_URL}/login`, { username, password });
       console.log("res from login page:", res)
       console.log("res.data from login page:", res.data)
-      localStorage.setItem("token", res.data);
+      // login.js
+      localStorage.setItem("token", JSON.stringify(res.data));
+
       setMessage("Login successful!");
       router.push("/"); // redirect to home page after login
     } catch (err) {
