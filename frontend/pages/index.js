@@ -14,6 +14,41 @@ export default function Home() {
   const [token, setToken] = useState(null);
   const router = useRouter();
 
+  const handleStart = async () => {
+    try {
+      const savedToken = localStorage.getItem("token");
+      if (!savedToken) {
+        alert("Not logged in!");
+        return;
+      }
+    
+      // misalnya token menyimpan info user (atau bisa ambil dari /profile API)
+      const userData = JSON.parse(savedToken);
+    
+      const res = await fetch("/api/validate-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: userData.username,
+          email: userData.email,
+          name: userData.name,
+        }),
+      });
+    
+      const data = await res.json();
+    
+      if (data.success) {
+        setConnected(true);   // ✅ baru connect websocket
+      } else {
+        alert("User validation failed: " + data.message);
+      }
+    } catch (err) {
+      console.error("Error validating user:", err);
+      alert("Server error while validating user.");
+    }
+  };
+
+
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
    // if (savedToken) setToken(savedToken);
@@ -21,7 +56,6 @@ export default function Home() {
       router.replace("/login"); // kalau tidak ada token, paksa ke login
     }
   }, [router]);
-
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -86,10 +120,7 @@ export default function Home() {
           
           <div className="h-full overflow-auto bg-gray-100 flex flex-col">
           <div className="flex justify-end space-x-4 p-4 bg-gray-100">
-            <button
-              onClick={() => setConnected(true)}
-              disabled={connected}
-            >
+            <button onClick={handleStart} disabled={connected}>
               Start
             </button>
             <button className="btn-grade">Grade</button>

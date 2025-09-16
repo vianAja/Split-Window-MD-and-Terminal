@@ -20,6 +20,7 @@ const wss = new WebSocketServer({ server });
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use("/api", require("./routes/user"));
 
 const SECRET_KEY = process.env.JWT_SECRET || "test123";
 
@@ -126,6 +127,9 @@ app.get("/profile", requireAuth, (req, res) => {
 app.get("/", (req, res) => {
   res.send("Backend running: WebSocket SSH server + Auth integrated.");
 });
+
+app.use("/api", require("./routes/user"));
+
 
 // WebSocket SSH
 wss.on("connection", (ws) => {
