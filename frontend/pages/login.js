@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 
-const API_URL = "http://localhost:3001";
+const API_URL = "http://localhost:3000";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -14,9 +14,10 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await axios.post(`${API_URL}/login`, { username, password });
-      console.log("res from login page:", res);
-      console.log("res.data from login page:", res.data);
-      console.log("res.data.token from login page:", res.data.token);
+      const text = await res.text();
+      console.log("Raw response:", text);
+      const data = JSON.parse(text);
+
       // login.js
       localStorage.setItem("token", JSON.stringify({
         token: res.data.token,      // ambil token asli dari server

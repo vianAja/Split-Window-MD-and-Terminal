@@ -26,9 +26,10 @@ export default function Home() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        username: userData.username,
-        email: userData.email,
-        name: userData.name,
+        token: userData.token
+//        username: userData.username,
+//        email: userData.email,
+//        name: userData.name,
       }),
     });
       console.log("localStorage token raw:", localStorage.getItem("token"));
