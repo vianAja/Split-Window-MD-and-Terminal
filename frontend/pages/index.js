@@ -21,7 +21,7 @@ export default function Home() {
         alert("Not logged in!");
         return;
       }
-
+      const userData = JSON.parse(savedToken);
       const res = await fetch("/api/validate-user", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
