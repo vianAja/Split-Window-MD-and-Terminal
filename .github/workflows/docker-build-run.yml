@@ -5,12 +5,14 @@ on:
     branches: [ "main" ]
 
 jobs:
-  docker-build-run:
+  Docker-Build-Run:
     runs-on: [self-hosted, Linux]  # pastikan sesuai label runner
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+  Validation-Logs:
+    runs-on: [self-hosted, Linux]
       - name: Run and Build Docker container
         run: |
           docker compose up -d --build

@@ -21,6 +21,8 @@ const wss = new WebSocketServer({ server });
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// route API
 app.use("/api", userRoutes);
 
 const SECRET_KEY = process.env.JWT_SECRET || "test123";
