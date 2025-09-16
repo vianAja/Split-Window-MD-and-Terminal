@@ -14,3 +14,11 @@ jobs:
       - name: Run and Build Docker container
         run: |
           docker compose up -d --build
+      
+      - name: Check log container frontend
+        run: |
+          docker logs frontend
+      
+      - name: Check log container backend
+        run: |
+          docker logs backend
