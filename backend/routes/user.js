@@ -1,7 +1,7 @@
 // routes/user.js
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const pool = require("./db");
+import pool from "./db";
 
 router.post("/validate-user", async (req, res) => {
   const { username, email, name } = req.body;

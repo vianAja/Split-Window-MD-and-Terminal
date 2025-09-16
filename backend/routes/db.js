@@ -1,12 +1,12 @@
-// db.js
-const { Pool } = require("pg");
+import pkg from "pg";
+const { Pool } = pkg;
 
 const pool = new Pool({
-  user: "vian",
-  host: "host.docker.internal",   // atau host.docker.internal kalau dari docker
-  database: "participant",
-  password: "vian",
+  user: "postgres",
+  host: "localhost",
+  database: "yourdb",
+  password: "yourpassword",
   port: 5432,
 });
 
-module.exports = pool;
+export default pool;
