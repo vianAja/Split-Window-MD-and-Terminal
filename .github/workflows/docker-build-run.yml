@@ -11,8 +11,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-  Validation-Logs:
-    runs-on: [self-hosted, Linux]
       - name: Run and Build Docker container
         run: |
           docker compose up -d --build
