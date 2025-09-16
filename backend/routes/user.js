@@ -25,7 +25,7 @@ router.post("/validate-user", async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log("Decoded JWT:", decoded);
-    
+
     const result = await pool.query(
       "SELECT * FROM users WHERE username=$1 AND email=$2 AND name=$3",
       [decoded.id, decoded.username, decoded.email]
@@ -61,16 +61,18 @@ router.post("/login", async (req, res) => {
     if (password !== user.password) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-
+    const payload = {
+      id: user.rows[0].id,
+      username: user.rows[0].username,
+      email: user.rows[0].email,
+      name: user.rows[0].name,
+    };
     // ✅ Buat JWT dengan payload user
-    const token = jwt.sign(
-      { id: user.id, username: user.username, email: user.email, name: user.name },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+
 
     // cuma kirim token
-    res.json({ token });
+    res.json({ token, payload });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });

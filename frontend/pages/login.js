@@ -19,12 +19,7 @@ export default function Login() {
       const data = JSON.parse(text);
 
       // login.js
-      localStorage.setItem("token", JSON.stringify({
-        token: res.data.token,      // ambil token asli dari server
-        username: res.data.username, // ikut simpan kalau server kirim
-        email: res.data.email,
-        name: res.data.name
-      }));
+      localStorage.setItem("user", JSON.stringify(res.data));
       setMessage("Login successful!");
       router.push("/"); // redirect to home page after login
     } catch (err) {
