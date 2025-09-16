@@ -22,20 +22,14 @@ export default function Home() {
         return;
       }
 
-      // misalnya token menyimpan info user (atau bisa ambil dari /profile API)
-      const userData = JSON.parse(savedToken);
-      console.log("User data from saved token:", userData)
       const res = await fetch("/api/validate-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: userData.username,
-          email: userData.email,
-          name: userData.name,
-        }),
-      });
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: savedToken }),
+    });
 
       const data = await res.json();
+      console.log("Validate-user response:", data);
 
       if (data.success) {
         setConnected(true);   // ✅ baru connect websocket
