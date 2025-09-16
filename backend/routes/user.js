@@ -1,7 +1,16 @@
 // routes/user.js
 import express from "express";
 const router = express.Router();
-import pool from "./db";
+import pkg from "pg";
+const { Pool } = pkg;
+
+const pool = new Pool({
+  user: "postgres",
+  host: "localhost",
+  database: "yourdb",
+  password: "yourpassword",
+  port: 5432,
+});
 
 router.post("/validate-user", async (req, res) => {
   const { username, email, name } = req.body;
