@@ -44,7 +44,7 @@ export default function Home() {
       }
     } catch (err) {
       console.log("Error validating user:", err);
-      alert("Server error while validating user.");
+      alert("Server error while validating user.", err);
     }
   };
 
