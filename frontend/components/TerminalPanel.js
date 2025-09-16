@@ -5,6 +5,7 @@ import "xterm/css/xterm.css";
 const TerminalPanel = ({ connected }) => {   // ⬅️ terima prop connected
   const terminalRef = useRef(null);
   const termRef = useRef(null);
+  const wsRef = useRef(null);
 
   useEffect(() => {
     if (!connected || !terminalRef.current) return;  
@@ -31,15 +32,17 @@ const TerminalPanel = ({ connected }) => {   // ⬅️ terima prop connected
       wsRef.current = ws;
     }
 
-    // ✅ cleanup kalau `connected` berubah jadi false / komponen unmount
     return () => {
-      if (!connected && wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-      }
-      if (!connected && termRef.current) {
-        termRef.current.dispose();
-        termRef.current = null;
+      // cleanup jika komponen unmount ATAU connected dimatikan
+      if (!connected) {
+        if (wsRef.current) {
+          wsRef.current.close();
+          wsRef.current = null;
+        }
+        if (termRef.current) {
+          termRef.current.dispose();
+          termRef.current = null;
+        }
       }
     };
   }, [connected]);
