@@ -10,6 +10,7 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import pkg from "pg";
+import userRoutes from "./routes/user.js";
 
 const { Pool } = pkg;
 dotenv.config();
@@ -20,7 +21,7 @@ const wss = new WebSocketServer({ server });
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use("/api", require("./routes/user"));
+app.use("/api", userRoutes);
 
 const SECRET_KEY = process.env.JWT_SECRET || "test123";
 
