@@ -45,21 +45,21 @@ def register():
         print("Register error:", e)
         return jsonify({"message": "Server error"}), 500
 
-@app.route("/login", methods=["POST"])
-def login():
-    data = request.get_json()
-    username = data.get("username")
-    password = data.get("password")
-    if not username or not password:
-        return jsonify({"message": "Missing username or password"}), 400
-    cursor.execute("SELECT id, username, password FROM users WHERE username=%s", (username,))
-    user = cursor.fetchone()
-    if not user:
-        return jsonify({"message": "Invalid credentials"}), 401
-    if not bcrypt.checkpw(password.encode(), user[2].encode()):
-        return jsonify({"message": "Invalid credentials"}), 401
-    token = jwt.encode({"id": user[0], "username": user[1]}, SECRET_KEY, algorithm="HS256")
-    return jsonify({"token": token})
+## @app.route("/login", methods=["POST"])
+## def login():
+##     data = request.get_json()
+##     username = data.get("username")
+##     password = data.get("password")
+##     if not username or not password:
+##         return jsonify({"message": "Missing username or password"}), 400
+##     cursor.execute("SELECT id, username, password FROM users WHERE username=%s", (username,))
+##     user = cursor.fetchone()
+##     if not user:
+##         return jsonify({"message": "Invalid credentials"}), 401
+##     if not bcrypt.checkpw(password.encode(), user[2].encode()):
+##         return jsonify({"message": "Invalid credentials"}), 401
+##     token = jwt.encode({"id": user[0], "username": user[1]}, SECRET_KEY, algorithm="HS256")
+##     return jsonify({"token": token})
 
 # Middleware JWT decorator
 def require_auth(f):

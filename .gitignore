@@ -3,3 +3,4 @@ backend/.env
 backend/.next
 frontend/node_modules
 frontend/.next
+run.py
