@@ -24,7 +24,7 @@ def login():
         (username,)
     )
     user = cursor.fetchone()
-    print('User in DB:',user)
+    print('User in DB:',user, flush=True)
     if not user:
         return jsonify({"message": "Invalid credentials"}), 401
 
@@ -33,7 +33,7 @@ def login():
     if not bcrypt.checkpw(password.encode(), user_password.encode()):
         return jsonify({"message": "Invalid credentials"}), 401
 
-    print(json.dumps({"id": user_id, "username": user_name, "course": user_course}, indent=4))
+    print(json.dumps({"id": user_id, "username": user_name, "course": user_course}, indent=4), flush=True)
     # JWT include username + course
     token = jwt.encode(
         {"id": user_id, "username": user_name, "course": user_course},
